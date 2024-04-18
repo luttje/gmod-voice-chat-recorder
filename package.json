@@ -1,0 +1,15 @@
+{
+  "name": "gmod-voice-chat-saver",
+  "description": "",
+  "author": "luttje",
+  "license": "MIT",
+  "version": "0.1.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@discordjs/opus": "^0.9.0",
+    "wav": "^1.0.2"
+  }
+}
