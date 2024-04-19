@@ -12,7 +12,7 @@ This project is a demonstrates how to save Voice Chat audio on a Garry's Mod Ser
 
 4. Run `npm install` in the repository directory.
 
-5. Run `node .` in the repository directory.
+5. Run `npm run start` in the repository directory.
 
 6. Install `gm_8bit` by:
 
@@ -38,11 +38,9 @@ This project is a demonstrates how to save Voice Chat audio on a Garry's Mod Ser
 
     2. `lua_run eightbit.EnableBroadcast(true)` to have eightbit broadcast voice data to the Node.js server.
 
-9. Start the Node.js server by running `node .` in this repository directory.
+9. Join your server, don't forget to plug in a microphone, then start voice chatting.
 
-10. Join your server, don't forget to plug in a microphone, then start voice chatting.
-
-11. You'll see debug output marking how many bytes were received:
+10. You'll see debug output marking how many bytes were received:
 
     ```bash
     $ node .
@@ -56,15 +54,54 @@ This project is a demonstrates how to save Voice Chat audio on a Garry's Mod Ser
     ... etc ...
     ```
 
-12. Each time a player speaks the data is saved to a file like `user_<STEAM_ID_64>_<CURRENT_TIMESTAMP>.wav` in this repository's directory.
+11. Each time a player speaks the data is saved to a file like `user_<STEAM_ID_64>_<CURRENT_TIMESTAMP>.wav` in the `recordings/untranscribed` directory.
 
     New files are created each time the player falls silent.
+
+## 👄 Voice Chat Transcription
+
+This example shows how to use [`sharpa-onnx`](https://github.com/k2-fsa/sherpa-onnx) to transcribe recorded voice chat to text. This uses a pre-trained model and works offline, on your CPU (no graphics card required).
+
+1. Download the pre-trained offline transducer model into this repository's directory:
+
+    ```bash
+    wget https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-zipformer-en-2023-06-26.tar.bz2
+    tar xvf sherpa-onnx-zipformer-en-2023-06-26.tar.bz2
+    ```
+
+2. Run the server with `npm run start:transcribe`
+
+3. When a player speaks, the audio is transcribed to text. You'll find transcribed audio moved to the `recordings/transcribed` directory.
+
+    Transcriptions can be found in `recordings/transcriptions/` where each transcription has the same name as the audio file (except with a `.log` extension).
+
+4. During transcription you might see output like this being repeated in the console:
+
+    ```bash
+    YYYY-MM-DD HH:MM:SS.000000 [W:onnxruntime:, graph_utils.cc:139 CanUpdateImplicitInputNameInSubgraphs]  Implicit input name <number> cannot be safely updated to <number> in one of the subgraphs.
+    ```
+
+> [!WARNING]
+> Note that transcription isn't perfect and will not work well with noisy audio or non-English speakers. In my experience it only works well if you articulate clearly and speak English with a neutral accent.
+> Nevertheless, seeing how this is all done on-device (offline) it's still pretty impressive!
+
+There are more models available like Chinese and Cantonese, [check out the sherpa onnx documentation for those](https://k2-fsa.github.io/sherpa/onnx/pretrained_models/offline-transducer/index.html). Support for GigaSpeech is implemented, to use it:
+
+1. Download the model **sherpa-onnx-zipformer-gigaspeech-2023-12-12 (English):**
+
+    ```bash
+    wget https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-zipformer-gigaspeech-2023-12-12.tar.bz2
+    tar xf sherpa-onnx-zipformer-gigaspeech-2023-12-12.tar.bz2
+    ls -lh sherpa-onnx-zipformer-gigaspeech-2023-12-12
+    ```
+
+2. Run the server with `npm run start:transcribe -- --model gigaspeech`
 
 ## 💡 Further ideas
 
 I intend to use this in some form for moderating voice chat on a Garry's Mod server. Here are some ideas for further development:
 
-- [ ] Automatically transcribe the audio to text.
+- [x] Automatically transcribe the audio to text
 - [ ] Use an LLM to detect toxic speech (for in-game text chat too).
 - [ ] Flag the audio (or text) chat for review by a moderator.
 - [ ] Create a mobile accessible web interface for easily reviewing flagged chats.
