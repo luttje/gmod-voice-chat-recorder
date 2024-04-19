@@ -61,11 +61,16 @@ function transcribe(wavFileName, model) {
 
         stream.acceptWaveform(recognizer.config.featConfig.sampleRate, flattened)
         recognizer.decode(stream)
-        const text = recognizer.getResult(stream).text
-        resolve(text)
 
-        stream.free()
-        recognizer.free()
+        try {
+          const text = recognizer.getResult(stream).text
+          resolve(text)
+        } catch (error) {
+          reject(error)
+        } finally {
+          stream.free()
+          recognizer.free()
+        }
       })
     })
 }

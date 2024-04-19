@@ -60,7 +60,11 @@ This project is a demonstrates how to save Voice Chat audio on a Garry's Mod Ser
 
 ## 👄 Voice Chat Transcription
 
-This example shows how to use [`sharpa-onnx`](https://github.com/k2-fsa/sherpa-onnx) to transcribe recorded voice chat to text. This uses a pre-trained model and works offline, on your CPU (no graphics card required).
+This example shows how to use [`sharpa-onnx`](https://github.com/k2-fsa/sherpa-onnx) to transcribe recorded voice chat to text. This uses a pre-trained model which works offline, even on your CPU.
+
+For this basic example we've chosen the fastest English model we've tried, but **other models like OpenAI Whisper are also supported. [&raquo; Read more](./docs/transcribe-other-models.md)**
+
+To get started transcribing voice chat automatically:
 
 1. Download the pre-trained offline transducer model into this repository's directory:
 
@@ -84,18 +88,6 @@ This example shows how to use [`sharpa-onnx`](https://github.com/k2-fsa/sherpa-o
 > [!WARNING]
 > Note that transcription isn't perfect and will not work well with noisy audio or non-English speakers. In my experience it only works well if you articulate clearly and speak English with a neutral accent.
 > Nevertheless, seeing how this is all done on-device (offline) it's still pretty impressive!
-
-There are more models available like Chinese and Cantonese, [check out the sherpa onnx documentation for those](https://k2-fsa.github.io/sherpa/onnx/pretrained_models/offline-transducer/index.html). Support for GigaSpeech is implemented, to use it:
-
-1. Download the model **sherpa-onnx-zipformer-gigaspeech-2023-12-12 (English):**
-
-    ```bash
-    wget https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-zipformer-gigaspeech-2023-12-12.tar.bz2
-    tar xf sherpa-onnx-zipformer-gigaspeech-2023-12-12.tar.bz2
-    ls -lh sherpa-onnx-zipformer-gigaspeech-2023-12-12
-    ```
-
-2. Run the server with `npm run start:transcribe -- --model gigaspeech`
 
 ## 💡 Further ideas
 
