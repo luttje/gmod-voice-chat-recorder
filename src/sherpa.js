@@ -58,6 +58,56 @@ const models = {
     ...noTdnn,
   },
 
+  // These online models don't seem to work with our current setup (and I can't get them to work atm)
+  // fr: {
+  //   isOnline: true,
+  //   modelType: 'zipformer',
+  //   transducer: {
+  //     encoder:
+  //       `./sherpa-onnx-streaming-zipformer-fr-2023-04-14/encoder-epoch-29-avg-9-with-averaged-model.int8.onnx`,
+  //     decoder:
+  //       `./sherpa-onnx-streaming-zipformer-fr-2023-04-14/decoder-epoch-29-avg-9-with-averaged-model.onnx`,
+  //     joiner:
+  //       `./sherpa-onnx-streaming-zipformer-fr-2023-04-14/joiner-epoch-29-avg-9-with-averaged-model.int8.onnx`,
+  //   },
+  //   tokens:
+  //       './sherpa-onnx-streaming-zipformer-fr-2023-04-14/tokens.txt',
+  //   numThreads: 1,
+  //   provider: 'cpu',
+  //   debug: 1,
+  //   paraformer: {
+  //     encoder: '',
+  //     decoder: '',
+  //   },
+  //   zipformer2Ctc: {
+  //     model: '',
+  //   },
+  // },
+
+  // 'zh-en': {
+  //   isOnline: true,
+  //   modelType: 'zipformer',
+  //   transducer: {
+  //     encoder:
+  //       `./sherpa-onnx-streaming-zipformer-bilingual-zh-en-2023-02-20/encoder-epoch-99-avg-1.int8.onnx`,
+  //     decoder:
+  //       `./sherpa-onnx-streaming-zipformer-bilingual-zh-en-2023-02-20/decoder-epoch-99-avg-1.onnx`,
+  //     joiner:
+  //       `./sherpa-onnx-streaming-zipformer-bilingual-zh-en-2023-02-20/joiner-epoch-99-avg-1.int8.onnx`,
+  //   },
+  //   tokens: `./sherpa-onnx-streaming-zipformer-bilingual-zh-en-2023-02-20/tokens.txt`,
+  //   provider: 'cpu',
+  //   numThreads: 1,
+  //   debug: 0,
+  //   paraformer: {
+  //     encoder: '',
+  //     decoder: '',
+  //   },
+  //   zipformer2Ctc: {
+  //     model: '',
+  //   },
+  // },
+
   gigaspeech: {
     modelType: 'transducer',
     transducer: {
@@ -135,7 +185,7 @@ const models = {
 }
 
 // Based on: https://github.com/k2-fsa/sherpa-onnx/blob/2e0ee0e8c862ecccba11cba893289b090caf1915/nodejs-examples/test-offline-transducer.js
-function createOfflineRecognizer(model) {
+function createRecognizer(model) {
   const modelConfig = models[model]
   const featConfig = {
     sampleRate: 24000,
@@ -145,6 +195,34 @@ function createOfflineRecognizer(model) {
   const lmConfig = {
     model: '',
     scale: 1.0,
+  }
+
+  const isOnline = modelConfig.isOnline || false
+
+  if (isOnline) {
+    const config = {
+      featConfig: featConfig,
+      modelConfig: {
+        ...modelConfig,
+      },
+      decodingMethod: 'greedy_search',
+      maxActivePaths: 4,
+      enableEndpoint: 1,
+      rule1MinTrailingSilence: 2.4,
+      rule2MinTrailingSilence: 1.2,
+      rule3MinUtteranceLength: 20,
+      hotwordsFile: '',
+      hotwordsScore: 1.5,
+      ctcFstDecoderConfig: {
+        graph: '',
+        maxActive: 3000,
+      }
+    }
+
+    // not for sherpa, used by us to determine if online or offline by us
+    delete config.modelConfig.isOnline
+
+    return sherpa_onnx.createOnlineRecognizer(config)
   }
 
   const config = {
@@ -161,5 +239,5 @@ function createOfflineRecognizer(model) {
 }
 
 module.exports = {
-  createOfflineRecognizer
+  createRecognizer
 }

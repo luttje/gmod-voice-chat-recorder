@@ -1,11 +1,11 @@
-const { createOfflineRecognizer } = require('./sherpa')
+const { createRecognizer } = require('./sherpa')
 const { Readable } = require('stream')
 const { Reader: WavReader } = require('wav')
 const fs = require('fs')
 
 // Based on: https://github.com/k2-fsa/sherpa-onnx/blob/2e0ee0e8c862ecccba11cba893289b090caf1915/nodejs-examples/test-offline-transducer.js
 function transcribe(wavFileName, model) {
-  const recognizer = createOfflineRecognizer(model)
+  const recognizer = createRecognizer(model)
   const stream = recognizer.createStream()
   const reader = new WavReader()
   const readable = new Readable().wrap(reader)
@@ -60,10 +60,12 @@ function transcribe(wavFileName, model) {
           Float32Array.from(buffer.reduce((a, b) => [...a, ...b], []))
 
         stream.acceptWaveform(recognizer.config.featConfig.sampleRate, flattened)
+
         recognizer.decode(stream)
 
         try {
-          const text = recognizer.getResult(stream).text
+          const result = recognizer.getResult(stream)
+          const text = result.text
           resolve(text)
         } catch (error) {
           reject(error)
